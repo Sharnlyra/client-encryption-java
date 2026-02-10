@@ -48,7 +48,7 @@ jobs:
           # Run policy check
           python policy-check.py \
             crypto-results.json \
-            policies/pqc-readiness.json
+            policies/strict.json
         continue-on-error: true
 
       - name: Upload scan results

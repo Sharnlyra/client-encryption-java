@@ -1,0 +1,62 @@
+# Crypto Policy Check - GitHub Action
+# Add this workflow to any repository to enforce cryptographic policies.
+#
+# Prerequisites:
+#   - crypto-finder installed (via Docker or binary)
+#   - A policy file in your repo (e.g., .github/crypto-policy.json)
+#
+# Usage:
+#   Copy this file to .github/workflows/crypto-policy.yml in your repo.
+
+name: Crypto Policy Check
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  crypto-scan:
+    name: Scan & Enforce Crypto Policy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run crypto-finder scan
+        id: scan
+        uses: docker://ghcr.io/scanoss/crypto-finder:latest
+        with:
+          args: scan --output /github/workspace/crypto-results.json /github/workspace
+        env:
+          SCANOSS_API_KEY: ${{ secrets.SCANOSS_API_KEY }}
+
+      - name: Check crypto policy
+        id: policy
+        run: |
+          # Install dependencies
+          pip install rich -q
+
+          # Run policy check
+          python policy-check.py \
+            crypto-results.json \
+            policies/pqc-readiness.json
+        continue-on-error: true
+
+      - name: Upload scan results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: crypto-scan-results
+          path: crypto-results.json
+
+      - name: Fail on policy violations
+        if: steps.policy.outcome == 'failure'
+        run: |
+          echo "::error::Crypto policy violations detected. See scan results for details."
+          exit 1

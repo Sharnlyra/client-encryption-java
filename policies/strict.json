@@ -1,0 +1,36 @@
+{
+  "name": "Strict Crypto Policy",
+  "description": "Strict policy: blocks SHA-1 based algorithms and legacy PRNGs. Warns on all block ciphers pending PQC review.",
+  "deny": {
+    "algorithms": [
+      "MD5",
+      "SHA-1",
+      "DES",
+      "3DES",
+      "RC4",
+      "RC2",
+      "Blowfish",
+      "SHA1PRNG"
+    ],
+    "algorithm_families": [
+      "MD5",
+      "SHA-1",
+      "DES",
+      "3DES",
+      "RC4",
+      "RC2",
+      "SHA1PRNG"
+    ],
+    "primitives": []
+  },
+  "warn": {
+    "algorithms": [],
+    "algorithm_families": ["RSA", "DSA", "ECDSA"],
+    "primitives": ["block-cipher"],
+    "notes": {
+      "RSA": "Vulnerable to quantum attacks (Shor's algorithm). Plan migration to ML-KEM/ML-DSA.",
+      "DSA": "Vulnerable to quantum attacks. Plan migration to ML-DSA.",
+      "block-cipher": "Block ciphers should be reviewed for PQC readiness and mode of operation."
+    }
+  }
+}

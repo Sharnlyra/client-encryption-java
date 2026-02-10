@@ -36,6 +36,9 @@ jobs:
         env:
           SCANOSS_API_KEY: ${{ secrets.SC_API_KEY }}
 
+      - name: Fix scan output permissions
+        run: sudo chown $(id -u):$(id -g) crypto-results.json
+
       - name: Check crypto policy
         id: policy
         run: |

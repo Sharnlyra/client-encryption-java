@@ -34,7 +34,7 @@ jobs:
         with:
           args: scan --output /github/workspace/crypto-results.json /github/workspace
         env:
-          SCANOSS_API_KEY: ${{ secrets.SCANOSS_API_KEY }}
+          SCANOSS_API_KEY: ${{ secrets.SC_API_KEY }}
 
       - name: Check crypto policy
         id: policy

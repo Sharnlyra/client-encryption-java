@@ -5,6 +5,7 @@ import com.mastercard.developer.crypto.hmac.HmacOperations;
 import com.mastercard.developer.crypto.keyderivation.KeyDerivationOperations;
 import com.mastercard.developer.crypto.signature.SignatureOperations;
 import com.mastercard.developer.crypto.thirdparty.BouncyCastleCrypto;
+import com.mastercard.developer.crypto.thirdparty.BouncyCastlePkixCrypto;
 import com.mastercard.developer.crypto.tls.TlsConfiguration;
 
 import javax.crypto.SecretKey;
@@ -26,6 +27,7 @@ public class CryptoMiddleware {
     private final KeyDerivationOperations keyDerivOps = new KeyDerivationOperations();
     private final CommonsCodecCrypto commonsCodec = new CommonsCodecCrypto();
     private final BouncyCastleCrypto bcCrypto = new BouncyCastleCrypto();
+    private final BouncyCastlePkixCrypto bcPkixCrypto = new BouncyCastlePkixCrypto();
     private final TlsConfiguration tlsConfig = new TlsConfiguration();
 
     /**
@@ -108,6 +110,43 @@ public class CryptoMiddleware {
 
     public byte[] hashBlake2b(byte[] data) {
         return bcCrypto.blake2b256(data);
+    }
+
+    /**
+     * DEPENDENCY SCANNING chains — bcpkix internally calls JCA.
+     * CryptoMiddleware → BouncyCastlePkixCrypto → bcpkix → JCA
+     *
+     * Inside bcpkix JAR: Cipher.getInstance("AES/CBC/...") via DefaultJcaJceHelper
+     */
+    public byte[] encryptPrivateKey(java.security.PrivateKey key, char[] password)
+            throws Exception {
+        return bcPkixCrypto.encryptPrivateKey(key, password);
+    }
+
+    /**
+     * Inside bcpkix JAR: Cipher.getInstance(...), SecretKeyFactory.getInstance(...)
+     */
+    public java.security.PrivateKey decryptPrivateKey(byte[] encryptedPkcs8, char[] password)
+            throws Exception {
+        return bcPkixCrypto.decryptPrivateKey(encryptedPkcs8, password);
+    }
+
+    /**
+     * Inside bcpkix JAR: KeyFactory.getInstance("RSA"/"ECDSA"/"DSA")
+     */
+    public KeyPair convertPemKeyPair(String pem) throws Exception {
+        return bcPkixCrypto.convertPemKeyPair(pem);
+    }
+
+    /**
+     * Inside bcpkix JAR: CertificateFactory.getInstance("X.509")
+     */
+    public java.security.cert.X509Certificate parsePemCertificate(String pem) throws Exception {
+        return bcPkixCrypto.parsePemCertificate(pem);
+    }
+
+    public String exportToPem(Object cryptoObject) throws Exception {
+        return bcPkixCrypto.toPem(cryptoObject);
     }
 
     /**

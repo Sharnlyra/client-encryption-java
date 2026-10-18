@@ -6,7 +6,6 @@
 [![](https://img.shields.io/maven-central/v/com.mastercard.developer/client-encryption.svg)](https://central.sonatype.com/artifact/com.mastercard.developer/client-encryption?smo=true)
 [![](https://www.javadoc.io/badge/com.mastercard.developer/client-encryption.svg?color=blue)](https://www.javadoc.io/doc/com.mastercard.developer/client-encryption)
 [![](https://img.shields.io/badge/license-MIT-yellow.svg)](https://github.com/Mastercard/client-encryption-java/blob/master/LICENSE)
-
 ## Table of Contents
 - [Overview](#overview)
   * [Compatibility](#compatibility)
